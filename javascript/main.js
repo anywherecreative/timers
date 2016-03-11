@@ -38,19 +38,25 @@ $(document).ready(function() {
 
 function friendlyTime(ms) {
   var rawMinutes = Math.round(Math.round(ms/1000,0)/60,0); //turn the time into minutes
-  var hours = Math.floor(rawMinutes/60);
-  var minutes = rawMinutes%60
+  var hours = Math.floor(rawMinutes/60); //devide into hours, floor the amount since we'll count it in minutes
+  var minutes = rawMinutes%60 //find the minutes by getting the remainder after hours division
   if(hours < 10) {
-    hours = "0"+hours
+    hours = "0"+hours //if hours is less then 10 we'll add a leading zero to make it look nice
   }
   if(minutes < 10) {
-    minutes = "0"+minutes
+    minutes = "0"+minutes //we'll add the same leading zero to minutes.
   }
   hours = hours.toString();
   if(hours.length > 3) {
-    //add hundreds seperator
+    //add hundreds seperator, this only applies to hours since the max minutes can be is 59
     var temp = hours;
     hours = "";
+    /**
+      we've applied the hours figure to temp so we can refill hours with the formatted string
+      we'll work backwards through the string, 3 characters at a time adding a comma to the beginning
+      after that we'll take the difference that wasn't accounted for in our loop and add it to the beginning
+      if there is no difference we'll parse the comma off
+    **/
     for(a = temp.length;a >= 3;a-=3) {
       hours = ","+temp.substring(a-3,a)+hours;
     }
