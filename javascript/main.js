@@ -1,7 +1,7 @@
 (function() {
-  var tasks = [];
+  var tasks = {};
   $(document).ready(function() {
-    if(JSON.parse(localStorage.getItem("tasks") != null)) {
+    if(localStorage.getItem("tasks") != null) {
       tasks = JSON.parse(localStorage.getItem("tasks"));
     }
     if(tasks == null || tasks.length < 1) {
@@ -11,20 +11,20 @@
       $.each(tasks,function(index,task) {
         var extra = ''
         var totalTime = 0;
-        var ds = "data-start='" + task.start + "'"
+        var ds;
         $('#timers').append("<div class='row-fluid' id='" + index + "'></div>");
-        var item = $('#timers .row-fluid:last-child');
+        var item = $('#' + index);
         item.append("<div class='col-md-8 description'>" + task.description + "</div>");
         if(task.start != null) {
-          totalTime = task.start-Date.now()
           extra = "running";
-
+          ds = "data-start='" + task.start + "'";
+          totalTime = task.totalTime + (Date.now()-task.start);
         }
         else {
           totalTime = task.totalTime;
         }
         item.append("<div class='col-md-2 time " + extra + "' " + ds + " data-time='" + totalTime + "'>" + friendlyTime(totalTime) + "</div>");
-        if(task.stop == null) {
+        if(task.start != null) {
           item.append("<div class='col-md-2 timer-toggle'><button class='btn btn-danger' data-action='stop'>Stop</button></div>");
         }
         else {
@@ -36,14 +36,14 @@
 
     $('#startTimer').click(function() {
       $('.no-timers').remove();
-      var tid = Date.now().toString(16)
+      var tid = Number(Date.now()).toString(16)
       tasks[tid] = {
         start: Date.now(),
         totalTime: 0,
         description: ''
       }
-      $('#timers').append("<div class='row-fluid' id='" + Date.now().toString(16) + "'></div>");
-      var item = $('#timers .row-fluid:last-child');
+      $('#timers').append("<div class='row-fluid' id='" + tid + "'></div>");
+      var item = $('#'+tid);
       item.append("<div class='col-md-8 description blank'>Click to add a description</div>");
       item.append("<div class='col-md-2 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
       item.append("<div class='col-md-2 timer-toggle'><button class='btn btn-danger' data-action='stop'>Stop</button></div>");
@@ -93,16 +93,17 @@
   function assignAction() {
     $('.timer-toggle BUTTON').click(function() {
       var item = $(this).parent().parent();
+      var id = item.attr('id');
       if($(this).data('action') == "stop") {
-        tasks[item.attr('id')].totalTime += Date.now()-tasks[item.attr('id')].start;
-        tasks[item.attr('id')].start = null;
-        tasks[item.attr('id')].description = $('.description',item).text();
+        tasks[id].totalTime += Date.now()-tasks[id].start;
+        tasks[id].start = null;
+        tasks[id].description = $('.description',item).text();
         $(this).removeClass('btn-danger');
         $(this).addClass('btn-success');
         $(this).text('Start');
         $(this).data('action','start');
         $('.time',item).removeClass('running');
-        $('.time',item).data('time',tasks[item.attr('id')].totalTime);
+        $('.time',item).data('time',tasks[id].totalTime);
       }
       else {
         tasks[item.attr('id')].start = Date.now();
@@ -113,10 +114,14 @@
         $('.time',item).addClass('running');
         $('.time',item).data('start',Date.now());
         $('.time',item).data('time',tasks[item.attr('id')].totalTime);
+        console.log(tasks[item.attr('id')].start);
       }
+      saveTimers();
     });
   }
-
+  function saveTimers() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
   window.setInterval(function() {
     $(".time.running").each(function() {
       $(this).text(friendlyTime($(this).data('time') + (Date.now()-$(this).data('start'))));
