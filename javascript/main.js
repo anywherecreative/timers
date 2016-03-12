@@ -1,71 +1,125 @@
-$(document).ready(function() {
-  console.log(friendlyTime(Date.parse("January 1,2016 17:30") - Date.parse("January 1,2016 16:30")));
-  console.log(friendlyTime(Date.parse("January 1,2017 14:30") - Date.parse("January 1,2016 11:36")));
-  console.log(friendlyTime(Date.parse("December 22,2120 14:30") - Date.parse("January 1,2016 20:36")));
-  var tasks;
-  if(JSON.parse(localStorage.getItem("tasks") != null)) {
-    tasks = JSON.parse(localStorage.getItem("tasks"));
-  }
-  if(tasks == null || tasks.length < 1) {
-    $('#timers').html("<div class='row-fluid'><div class='col-md-12'><p class='no-timers'>No Timers Found</p></div></div>");
-  }
-  else {
-    $.each(tasks,function() {
-      var extra = ''
-      var totalTime = 0;
-      $('#timers').append("<div class='row-fluid'></div>");
-      var item = $('#timers .row-fluid:last-child');
-      item.append("<div class='col-md-8 description'>" + item.description + "</div>");
-      if(item.stop == null) {
-        totalTime = start-Date.now()
-        extra = "running";
-      }
-      else {
-        totalTime = start-stop;
-      }
-      item.append("<div class='col-md-8 time'>" + totalTime + "</div>");
-    });
-  }
-
-  $('#startTimer').click(function() {
-    tasks.push({
-      start: Date.now(),
-      stop: null,
-      description: ''
-    });
-  })
-});
-
-function friendlyTime(ms) {
-  var rawMinutes = Math.round(Math.round(ms/1000,0)/60,0); //turn the time into minutes
-  var hours = Math.floor(rawMinutes/60); //devide into hours, floor the amount since we'll count it in minutes
-  var minutes = rawMinutes%60 //find the minutes by getting the remainder after hours division
-  if(hours < 10) {
-    hours = "0"+hours //if hours is less then 10 we'll add a leading zero to make it look nice
-  }
-  if(minutes < 10) {
-    minutes = "0"+minutes //we'll add the same leading zero to minutes.
-  }
-  hours = hours.toString();
-  if(hours.length > 3) {
-    //add hundreds seperator, this only applies to hours since the max minutes can be is 59
-    var temp = hours;
-    hours = "";
-    /**
-      we've applied the hours figure to temp so we can refill hours with the formatted string
-      we'll work backwards through the string, 3 characters at a time adding a comma to the beginning
-      after that we'll take the difference that wasn't accounted for in our loop and add it to the beginning
-      if there is no difference we'll parse the comma off
-    **/
-    for(a = temp.length;a >= 3;a-=3) {
-      hours = ","+temp.substring(a-3,a)+hours;
+(function() {
+  var tasks = [];
+  $(document).ready(function() {
+    if(JSON.parse(localStorage.getItem("tasks") != null)) {
+      tasks = JSON.parse(localStorage.getItem("tasks"));
     }
-    if(temp.length%3 == 0) {
-      hours = hours.substring(1);
+    if(tasks == null || tasks.length < 1) {
+      $('#timers').html("<div class='row-fluid'><div class='col-md-12'><p class='no-timers'>No Timers Found</p></div></div>");
     }
     else {
-      hours = temp.substring(0,temp.length%3)+hours;
+      $.each(tasks,function(index,task) {
+        var extra = ''
+        var totalTime = 0;
+        var ds = "data-start='" + task.start + "'"
+        $('#timers').append("<div class='row-fluid' id='" + index + "'></div>");
+        var item = $('#timers .row-fluid:last-child');
+        item.append("<div class='col-md-8 description'>" + task.description + "</div>");
+        if(task.start != null) {
+          totalTime = task.start-Date.now()
+          extra = "running";
+
+        }
+        else {
+          totalTime = task.totalTime;
+        }
+        item.append("<div class='col-md-2 time " + extra + "' " + ds + " data-time='" + totalTime + "'>" + friendlyTime(totalTime) + "</div>");
+        if(task.stop == null) {
+          item.append("<div class='col-md-2 timer-toggle'><button class='btn btn-danger' data-action='stop'>Stop</button></div>");
+        }
+        else {
+          item.append("<div class='col-md-2 timer-toggle'><button class='btn btn-success' data-action='start'>Start</button></div>");
+        }
+      });
+      assignAction();
     }
+
+    $('#startTimer').click(function() {
+      $('.no-timers').remove();
+      var tid = Date.now().toString(16)
+      tasks[tid] = {
+        start: Date.now(),
+        totalTime: 0,
+        description: ''
+      }
+      $('#timers').append("<div class='row-fluid' id='" + Date.now().toString(16) + "'></div>");
+      var item = $('#timers .row-fluid:last-child');
+      item.append("<div class='col-md-8 description blank'>Click to add a description</div>");
+      item.append("<div class='col-md-2 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
+      item.append("<div class='col-md-2 timer-toggle'><button class='btn btn-danger' data-action='stop'>Stop</button></div>");
+      assignAction();
+    });
+  });
+
+  function friendlyTime(ms) {
+    var rawSeconds = Math.round(ms/1000,0)
+    var rawMinutes = Math.floor(rawSeconds/60,0); //turn the time into minutes
+    var hours = Math.floor(rawMinutes/60); //devide into hours, floor the amount since we'll count it in minutes
+    var minutes = rawMinutes%60 //find the minutes by getting the remainder after hours division
+    var seconds = rawSeconds%60
+    if(hours < 10) {
+      hours = "0"+hours //if hours is less then 10 we'll add a leading zero to make it look nice
+    }
+    if(minutes < 10) {
+      minutes = "0"+minutes //we'll add the same leading zero to minutes.
+    }
+    if(seconds < 10) {
+      seconds = "0"+seconds
+    }
+    hours = hours.toString();
+    if(hours.length > 3) {
+      //add hundreds seperator, this only applies to hours since the max minutes can be is 59
+      var temp = hours;
+      hours = "";
+      /**
+        we've applied the hours figure to temp so we can refill hours with the formatted string
+        we'll work backwards through the string, 3 characters at a time adding a comma to the beginning
+        after that we'll take the difference that wasn't accounted for in our loop and add it to the beginning
+        if there is no difference we'll parse the comma off
+      **/
+      for(a = temp.length;a >= 3;a-=3) {
+        hours = ","+temp.substring(a-3,a)+hours;
+      }
+      if(temp.length%3 == 0) {
+        hours = hours.substring(1);
+      }
+      else {
+        hours = temp.substring(0,temp.length%3)+hours;
+      }
+    }
+    return hours+":"+minutes+":"+seconds;
   }
-  return hours+":"+minutes;
-}
+
+  function assignAction() {
+    $('.timer-toggle BUTTON').click(function() {
+      var item = $(this).parent().parent();
+      if($(this).data('action') == "stop") {
+        tasks[item.attr('id')].totalTime += Date.now()-tasks[item.attr('id')].start;
+        tasks[item.attr('id')].start = null;
+        tasks[item.attr('id')].description = $('.description',item).text();
+        $(this).removeClass('btn-danger');
+        $(this).addClass('btn-success');
+        $(this).text('Start');
+        $(this).data('action','start');
+        $('.time',item).removeClass('running');
+        $('.time',item).data('time',tasks[item.attr('id')].totalTime);
+      }
+      else {
+        tasks[item.attr('id')].start = Date.now();
+        $(this).removeClass('btn-success');
+        $(this).addClass('btn-danger');
+        $(this).text('Stop');
+        $(this).data('action','stop');
+        $('.time',item).addClass('running');
+        $('.time',item).data('start',Date.now());
+        $('.time',item).data('time',tasks[item.attr('id')].totalTime);
+      }
+    });
+  }
+
+  window.setInterval(function() {
+    $(".time.running").each(function() {
+      $(this).text(friendlyTime($(this).data('time') + (Date.now()-$(this).data('start'))));
+    });
+  },1000)
+})();
