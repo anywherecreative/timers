@@ -14,7 +14,12 @@
         var ds;
         $('#timers').append("<div class='row-fluid' id='" + index + "'></div>");
         var item = $('#' + index);
-        item.append("<div class='col-md-8 description'>" + task.description + "</div>");
+        if(task.description != '') {
+          item.append("<div class='col-md-8 description'>" + task.description + "</div>");
+        }
+        else {
+          item.append("<div class='col-md-8 description blank'>Click to add a description</div>");
+        }
         if(task.start != null) {
           extra = "running";
           ds = "data-start='" + task.start + "'";
@@ -99,7 +104,9 @@
       if($(this).data('action') == "stop") {
         tasks[id].totalTime += Date.now()-tasks[id].start;
         tasks[id].start = null;
-        tasks[id].description = $('.description',item).text();
+        if(!$('.description').hasClass('blank')) {
+          tasks[id].description = $('.description',item).text();
+        }
         $(this).removeClass('btn-danger');
         $(this).addClass('btn-success');
         $(this).text('Start');
@@ -117,6 +124,26 @@
         $('.time',item).data('start',Date.now());
         $('.time',item).data('time',tasks[item.attr('id')].totalTime);
         console.log(tasks[item.attr('id')].start);
+      }
+      saveTimers();
+    });
+    $('.description').click(function() {
+      if($(this).hasClass('blank')) {
+        $(this).empty();
+        $(this).removeClass('blank');
+      }
+      $(this).attr('contenteditable','true');
+      $(this).focus();
+    })
+    $('.description').blur(function() {
+      $(this).attr('contenteditable','false');
+      if($(this).text() == '') {
+        $(this).addClass('blank');
+        $(this).text("Click to add a description");
+        tasks[$(this).parent().attr('id')].description = "";
+      }
+      else {
+        tasks[$(this).parent().attr('id')].description = $(this).text();
       }
       saveTimers();
     });

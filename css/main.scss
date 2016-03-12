@@ -1,0 +1,8 @@
+.description {
+  &:not([contenteditable="true"]) {
+    cursor:pointer;
+  }
+  &.blank {
+    color:#e0e0e0;
+  }
+}
