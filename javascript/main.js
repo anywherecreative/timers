@@ -1,6 +1,8 @@
 (function() {
   var tasks = {};
+  var defaultDescription = "Click to add a description";
   $(document).ready(function() {
+    checkSize();
     if(localStorage.getItem("tasks") != null) {
       tasks = JSON.parse(localStorage.getItem("tasks"));
     }
@@ -16,10 +18,10 @@
         $('#timers').append("<div class='row-fluid timer' id='" + index + "'></div>");
         var item = $('#' + index);
         if(task.description != '') {
-          item.append("<div class='col-xs-8 description'>" + task.description + "</div>");
+          item.append("<div class='col-md-8 col-sm-12 description'>" + task.description + "</div>");
         }
         else {
-          item.append("<div class='col-xs-8 description blank'>Click to add a description</div>");
+          item.append("<div class='col-md-8 col-sm-12 description blank'>" + defaultDescription + "</div>");
         }
         if(task.start != null) {
           extra = "running";
@@ -29,12 +31,12 @@
         else {
           totalTime = task.totalTime;
         }
-        item.append("<div class='col-xs-2 time " + extra + "' " + ds + " data-time='" + task.totalTime + "'>" + friendlyTime(totalTime) + "</div>");
+        item.append("<div class='col-md-2 col-sm-6 time " + extra + "' " + ds + " data-time='" + task.totalTime + "'>" + friendlyTime(totalTime) + "</div>");
         if(task.start != null) {
-          item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+          item.append("<div class='col-md-2 col-sm-6 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
         }
         else {
-          item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+          item.append("<div class='col-md-2 col-sm-6 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
         }
       });
       assignAction();
@@ -55,12 +57,15 @@
       }
       $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
       var item = $('#'+tid);
-      item.append("<div class='col-xs-8 description blank'>Click to add a description</div>");
-      item.append("<div class='col-xs-2 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
-      item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+      item.append("<div class='col-md-8 col-sm-12 description blank'>" + defaultDescription + "</div>");
+      item.append("<div class='col-md-2 col-sm-6 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
+      item.append("<div class='col-md-2 col-sm-6 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
       assignAction();
       saveTimers();
     });
+    $(window).resize(function() {
+      checkSize();
+    })
   });
 
   function friendlyTime(ms) {
@@ -103,6 +108,7 @@
   }
 
   function assignAction() {
+    $('.timer, .delete,.description').off();
     $('.timer-toggle BUTTON:not(.delete)').click(function() {
       var item = $(this).parent().parent();
       var id = item.attr('id');
@@ -144,7 +150,7 @@
       $(this).attr('contenteditable','false');
       if($(this).text() == '') {
         $(this).addClass('blank');
-        $(this).text("Click to add a description");
+        $(this).text(defaultDescription);
         tasks[$(this).parent().attr('id')].description = "";
       }
       else {
@@ -181,6 +187,16 @@
 
   function showAll() {
 
+  }
+
+  function checkSize() {
+    if($(window).width() > 960) {
+      defaultDescription = "Click to add a Description";
+    }
+    else {
+      defaultDescription = "Tap to add a Description";
+    }
+    $('.description.blank').text(defaultDescription);
   }
 
 })();

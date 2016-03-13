@@ -32,3 +32,32 @@
   margin-left:10px;
   color:#c00 !important;
 }
+.time {
+  padding: 20px 0 !important;
+  font-size: 22px;
+  line-height:1.1111111111;
+}
+.description {
+  font-size:18px;
+  line-height:1.333333333;
+  padding:20px 10px !important;
+}
+@media (max-width:767px) {
+  .description {
+    padding-bottom:0 !important;
+  }
+  .timer-toggle, .time {
+    margin:0 !important;
+    box-sizing:border-box;
+  }
+  .time {
+    width:60%;
+    float:left;
+    padding:20px 10px !important;
+  }
+  .timer-toggle {
+    width:40%;
+    float:right;
+    text-align:right !important;
+  }
+}
