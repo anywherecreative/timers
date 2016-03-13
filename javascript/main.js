@@ -4,10 +4,11 @@
     if(localStorage.getItem("tasks") != null) {
       tasks = JSON.parse(localStorage.getItem("tasks"));
     }
-    if(tasks == null || tasks.length < 1) {
+    if(tasks == null || Object.keys(tasks).length < 1) {
       $('#timers').html("<div class='row-fluid'><div class='col-xs-12'><p class='no-timers'>No Timers Found</p></div></div>");
     }
     else {
+      taskView = showDate(Date.now());
       $.each(tasks,function(index,task) {
         var extra = ''
         var totalTime = 0;
@@ -30,29 +31,33 @@
         }
         item.append("<div class='col-xs-2 time " + extra + "' " + ds + " data-time='" + task.totalTime + "'>" + friendlyTime(totalTime) + "</div>");
         if(task.start != null) {
-          item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button></div>");
+          item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
         }
         else {
-          item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button></div>");
+          item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
         }
       });
       assignAction();
     }
 
+    /**
+      start a new timer
+    **/
     $('#startTimer').click(function() {
       $('.no-timers').remove();
       var tid = Number(Date.now()).toString(16)
       tasks[tid] = {
-        start: Date.now(),
-        totalTime: 0,
-        description: ''
+        created: Date.now(), //this holds the date the timer was started
+        start: Date.now(), //when the timer was last started
+        totalTime: 0, //the total time adde to the timer
+        description: '', //the description the user has given
+        keywords: {} //any keywords the user assigns to timer
       }
-      console.log(Object.keys(tasks).length);
       $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
       var item = $('#'+tid);
       item.append("<div class='col-xs-8 description blank'>Click to add a description</div>");
       item.append("<div class='col-xs-2 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
-      item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button></div>");
+      item.append("<div class='col-xs-2 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
       assignAction();
       saveTimers();
     });
@@ -98,7 +103,7 @@
   }
 
   function assignAction() {
-    $('.timer-toggle BUTTON').click(function() {
+    $('.timer-toggle BUTTON:not(.delete)').click(function() {
       var item = $(this).parent().parent();
       var id = item.attr('id');
       if($(this).data('action') == "stop") {
@@ -147,7 +152,21 @@
       }
       saveTimers();
     });
+    $('.timer').click(function() {
+      //$(this).toggleClass('selected');
+    });
+    $('.delete').click(function() {
+      if(confirm('Are you sure you want to delete this timer?')) {
+        $("#"+$(this).data('timer')).slideUp(300);
+        delete tasks[$(this).data('timer')];
+      }
+      if(tasks == null || Object.keys(tasks).length < 1) {
+        $('#timers').html("<div class='row-fluid'><div class='col-xs-12'><p class='no-timers'>No Timers Found</p></div></div>");
+      }
+      saveTimers();
+    })
   }
+
   function saveTimers() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }
@@ -156,4 +175,12 @@
       $(this).text(friendlyTime($(this).data('time') + (Date.now()-$(this).data('start'))));
     });
   },1000)
+  function showDate(day) {
+
+  }
+
+  function showAll() {
+
+  }
+
 })();
