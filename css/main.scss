@@ -43,7 +43,15 @@
   padding:20px 10px !important;
 }
 @media (max-width:767px) {
+  .container-fluid, .container-fluid>.row-fluid, .main {
+    margin:0;
+    padding:0;
+  }
+  H1, .starter {
+    margin:10px;
+  }
   .description {
+    padding-top:10px !important;
     padding-bottom:0 !important;
   }
   .timer-toggle, .time {
@@ -51,12 +59,12 @@
     box-sizing:border-box;
   }
   .time {
-    width:60%;
+    width:40%;
     float:left;
     padding:20px 10px !important;
   }
   .timer-toggle {
-    width:40%;
+    width:60%;
     float:right;
     text-align:right !important;
   }

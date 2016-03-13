@@ -18,10 +18,10 @@
         $('#timers').append("<div class='row-fluid timer' id='" + index + "'></div>");
         var item = $('#' + index);
         if(task.description != '') {
-          item.append("<div class='col-md-8 col-sm-12 description'>" + task.description + "</div>");
+          item.append("<div class='col-md-7 col-sm-12 description'>" + task.description + "</div>");
         }
         else {
-          item.append("<div class='col-md-8 col-sm-12 description blank'>" + defaultDescription + "</div>");
+          item.append("<div class='col-md-7 col-sm-12 description blank'>" + defaultDescription + "</div>");
         }
         if(task.start != null) {
           extra = "running";
@@ -33,10 +33,10 @@
         }
         item.append("<div class='col-md-2 col-sm-6 time " + extra + "' " + ds + " data-time='" + task.totalTime + "'>" + friendlyTime(totalTime) + "</div>");
         if(task.start != null) {
-          item.append("<div class='col-md-2 col-sm-6 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+          item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
         }
         else {
-          item.append("<div class='col-md-2 col-sm-6 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+          item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
         }
       });
       assignAction();
@@ -57,9 +57,9 @@
       }
       $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
       var item = $('#'+tid);
-      item.append("<div class='col-md-8 col-sm-12 description blank'>" + defaultDescription + "</div>");
+      item.append("<div class='col-md-7 col-sm-12 description blank'>" + defaultDescription + "</div>");
       item.append("<div class='col-md-2 col-sm-6 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
-      item.append("<div class='col-md-2 col-sm-6 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+      item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
       assignAction();
       saveTimers();
     });
