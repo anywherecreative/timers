@@ -1,9 +1,12 @@
 (function() {
   var tasks = {};
   var defaultDescription = "Click to add a description";
-  var taskView;
+  var taskView = {};
   $(document).ready(function() {
-    taskView = showDate(Date.now());
+    if(localStorage.getItem("tasks") != null) {
+      tasks = JSON.parse(localStorage.getItem("tasks"));
+    }
+    showDate(Date.now());
     var d = new Date();
     var options = {
       weekday: "long", year: "numeric", month: "short",
@@ -152,8 +155,27 @@
     });
   },1000)
   function showDate(day, month, year) {
+    var d;
+    if(typeof day == 'undefined' || typeof month == 'undefined' || typeof year == 'undefined') {
+      d = new Date() //just use today
+    }
+    else {
+      try {
+        d = new Date(year,month,day);
+      }
+      catch(err) {
+        d = new Date();
+      }//END catch
+    }//END else
 
-  }
+    $.each(tasks,function(index,task) {
+      var td = new Date(task.created);
+      console.log("run" + td.toDateString() + " original: " + task.created);
+      if(td.getMonth() == d.getMonth() && td.getDate() == d.getDate()) {
+        taskView[index] = tasks[index];
+      }
+    });
+  } //END showDate()
 
   function showAll() {
 
@@ -177,7 +199,7 @@
       $('#timers').html("<div class='row-fluid'><div class='col-xs-12'><p class='no-timers'>No Timers Found</p></div></div>");
     }
     else {
-      $.each(tasks,function(index,task) {
+      $.each(taskView,function(index,task) {
         var extra = ''
         var totalTime = 0;
         var ds;
