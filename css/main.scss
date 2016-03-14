@@ -70,7 +70,7 @@
   }
 }
 @media print {
-  BUTTON, .timer-toggle {
+  BUTTON, .timer-toggle,NAV {
     display:none !important;
   }
   .description {

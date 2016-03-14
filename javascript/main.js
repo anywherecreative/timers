@@ -6,6 +6,9 @@
     if(localStorage.getItem("tasks") != null) {
       tasks = JSON.parse(localStorage.getItem("tasks"));
     }
+    $.datepicker.formatDate( "yy-mm-dd", new Date());
+    $( "#datepicker" ).datepicker();
+    $( "#datepicker" ).datepicker("setDate", new Date());
     showDate(Date.now());
     var d = new Date();
     var options = {
@@ -15,6 +18,16 @@
     $('#print-date').text('Generated: ' + d.toLocaleTimeString("en-us", options));
     checkSize();
     refreshTasks();
+
+    /**
+      change the date
+    **/
+    $("#datepicker").change(function() {
+      d = $(this).datepicker('getDate');
+      showDate(d.getDate(), d.getMonth(), d.getYear());
+      refreshTasks();
+    });
+
     /**
       start a new timer
     **/
@@ -107,7 +120,6 @@
         $('.time',item).addClass('running');
         $('.time',item).data('start',Date.now());
         $('.time',item).data('time',tasks[item.attr('id')].totalTime);
-        console.log(tasks[item.attr('id')].start);
       }
       saveTimers();
     });
@@ -156,6 +168,7 @@
   },1000)
   function showDate(day, month, year) {
     var d;
+    taskView = {};
     if(typeof day == 'undefined' || typeof month == 'undefined' || typeof year == 'undefined') {
       d = new Date() //just use today
     }
@@ -170,7 +183,6 @@
 
     $.each(tasks,function(index,task) {
       var td = new Date(task.created);
-      console.log("run" + td.toDateString() + " original: " + task.created);
       if(td.getMonth() == d.getMonth() && td.getDate() == d.getDate()) {
         taskView[index] = tasks[index];
       }
@@ -192,6 +204,7 @@
   }
 
   function refreshTasks() {
+    $('#timers').empty();
     if(localStorage.getItem("tasks") != null) {
       tasks = JSON.parse(localStorage.getItem("tasks"));
     }
