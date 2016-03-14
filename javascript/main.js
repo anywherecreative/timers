@@ -32,22 +32,11 @@
       start a new timer
     **/
     $('#startTimer').click(function() {
-      $('.no-timers').remove();
-      var tid = Number(Date.now()).toString(16);
-      tasks[tid] = {
-        created: Date.now(), //this holds the date the timer was started
-        start: Date.now(), //when the timer was last started
-        totalTime: 0, //the total time adde to the timer
-        description: '', //the description the user has given
-        keywords: {} //any keywords the user assigns to timer
-      }
-      $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
-      var item = $('#'+tid);
-      item.append("<div class='col-md-7 col-sm-12 description blank'><span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span></div>");
-      item.append("<div class='col-md-2 col-sm-6 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
-      item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
-      assignAction();
-      saveTimers();
+      addTimer()
+    });
+    $('#addDetails').click(function(e) {
+      e.preventDefault();
+      addTimer(prompt("Description"));
     });
     $(window).resize(function() {
       checkSize();
@@ -242,6 +231,31 @@
       });
       assignAction();
     }
+  }
+
+  function addTimer(description) {
+    $('.no-timers').remove();
+    var tid = Number(Date.now()).toString(16);
+    $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
+    var item = $('#'+tid);
+    if(typeof description == null) {
+      item.append("<div class='col-md-7 col-sm-12 description blank'><span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span></div>");
+      description = '';
+    }
+    else {
+      item.append("<div class='col-md-7 col-sm-12 description'><span class='hidden-print'>" + description + "</span><span class='visible-print-inline'>No Description</span></div>");
+    }
+    item.append("<div class='col-md-2 col-sm-6 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
+    item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+    tasks[tid] = {
+      created: Date.now(), //this holds the date the timer was started
+      start: Date.now(), //when the timer was last started
+      totalTime: 0, //the total time adde to the timer
+      description: '', //the description the user has given
+      keywords: {} //any keywords the user assigns to timer
+    }
+    assignAction();
+    saveTimers();
   }
 
 })();
