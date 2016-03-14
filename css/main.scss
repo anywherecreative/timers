@@ -42,7 +42,7 @@
   line-height:1.333333333;
   padding:20px 10px !important;
 }
-@media (max-width:767px) {
+@media screen and (max-width:767px) {
   .container-fluid, .container-fluid>.row-fluid, .main {
     margin:0;
     padding:0;
@@ -67,5 +67,22 @@
     width:60%;
     float:right;
     text-align:right !important;
+  }
+}
+@media print {
+  BUTTON, .timer-toggle {
+    display:none !important;
+  }
+  .description {
+    width:80%;
+    float:left;
+    margin:0 !important;
+    padding:5px 0 !important;
+  }
+  .time {
+    float:right;
+    width:15%;
+    margin:0 !important;
+    padding:5px 0 !important;
   }
 }

@@ -1,53 +1,23 @@
 (function() {
   var tasks = {};
   var defaultDescription = "Click to add a description";
+  var taskView;
   $(document).ready(function() {
+    taskView = showDate(Date.now());
+    var d = new Date();
+    var options = {
+      weekday: "long", year: "numeric", month: "short",
+      day: "numeric", hour: "2-digit", minute: "2-digit"
+    };
+    $('#print-date').text('Generated: ' + d.toLocaleTimeString("en-us", options));
     checkSize();
-    if(localStorage.getItem("tasks") != null) {
-      tasks = JSON.parse(localStorage.getItem("tasks"));
-    }
-    if(tasks == null || Object.keys(tasks).length < 1) {
-      $('#timers').html("<div class='row-fluid'><div class='col-xs-12'><p class='no-timers'>No Timers Found</p></div></div>");
-    }
-    else {
-      taskView = showDate(Date.now());
-      $.each(tasks,function(index,task) {
-        var extra = ''
-        var totalTime = 0;
-        var ds;
-        $('#timers').append("<div class='row-fluid timer' id='" + index + "'></div>");
-        var item = $('#' + index);
-        if(task.description != '') {
-          item.append("<div class='col-md-7 col-sm-12 description'>" + task.description + "</div>");
-        }
-        else {
-          item.append("<div class='col-md-7 col-sm-12 description blank'>" + defaultDescription + "</div>");
-        }
-        if(task.start != null) {
-          extra = "running";
-          ds = "data-start='" + task.start + "'";
-          totalTime = task.totalTime + (Date.now()-task.start);
-        }
-        else {
-          totalTime = task.totalTime;
-        }
-        item.append("<div class='col-md-2 col-sm-6 time " + extra + "' " + ds + " data-time='" + task.totalTime + "'>" + friendlyTime(totalTime) + "</div>");
-        if(task.start != null) {
-          item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
-        }
-        else {
-          item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
-        }
-      });
-      assignAction();
-    }
-
+    refreshTasks();
     /**
       start a new timer
     **/
     $('#startTimer').click(function() {
       $('.no-timers').remove();
-      var tid = Number(Date.now()).toString(16)
+      var tid = Number(Date.now()).toString(16);
       tasks[tid] = {
         created: Date.now(), //this holds the date the timer was started
         start: Date.now(), //when the timer was last started
@@ -57,7 +27,7 @@
       }
       $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
       var item = $('#'+tid);
-      item.append("<div class='col-md-7 col-sm-12 description blank'>" + defaultDescription + "</div>");
+      item.append("<div class='col-md-7 col-sm-12 description blank'><span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span></div>");
       item.append("<div class='col-md-2 col-sm-6 time running' data-time='0' data-start='" + Date.now() + "'>00:00:00</div>");
       item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-lg btn-danger' data-action='stop'>Stop</button><button data-timer='" + tid + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
       assignAction();
@@ -150,7 +120,7 @@
       $(this).attr('contenteditable','false');
       if($(this).text() == '') {
         $(this).addClass('blank');
-        $(this).text(defaultDescription);
+        $(this).html("<span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span>");
         tasks[$(this).parent().attr('id')].description = "";
       }
       else {
@@ -181,7 +151,7 @@
       $(this).text(friendlyTime($(this).data('time') + (Date.now()-$(this).data('start'))));
     });
   },1000)
-  function showDate(day) {
+  function showDate(day, month, year) {
 
   }
 
@@ -196,7 +166,47 @@
     else {
       defaultDescription = "Tap to add a Description";
     }
-    $('.description.blank').text(defaultDescription);
+    $('.description.blank').html("<span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span>");
+  }
+
+  function refreshTasks() {
+    if(localStorage.getItem("tasks") != null) {
+      tasks = JSON.parse(localStorage.getItem("tasks"));
+    }
+    if(tasks == null || Object.keys(tasks).length < 1) {
+      $('#timers').html("<div class='row-fluid'><div class='col-xs-12'><p class='no-timers'>No Timers Found</p></div></div>");
+    }
+    else {
+      $.each(tasks,function(index,task) {
+        var extra = ''
+        var totalTime = 0;
+        var ds;
+        $('#timers').append("<div class='row-fluid timer' id='" + index + "'></div>");
+        var item = $('#' + index);
+        if(task.description != '') {
+          item.append("<div class='col-md-7 col-sm-12 description'>" + task.description + "</div>");
+        }
+        else {
+          item.append("<div class='col-md-7 col-sm-12 description blank'><span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span></div>");
+        }
+        if(task.start != null) {
+          extra = "running";
+          ds = "data-start='" + task.start + "'";
+          totalTime = task.totalTime + (Date.now()-task.start);
+        }
+        else {
+          totalTime = task.totalTime;
+        }
+        item.append("<div class='col-md-2 col-sm-6 time " + extra + "' " + ds + " data-time='" + task.totalTime + "'>" + friendlyTime(totalTime) + "</div>");
+        if(task.start != null) {
+          item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-danger btn-lg' data-action='stop'>Stop</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+        }
+        else {
+          item.append("<div class='col-md-3 col-sm-6 timer-toggle'><button class='btn btn-success btn-lg' data-action='start'>Start</button><button data-timer='" + index + "' class='delete btn btn-default btn-lg'><i class='fa fa-trash fa-3'></i></button></div>");
+        }
+      });
+      assignAction();
+    }
   }
 
 })();
