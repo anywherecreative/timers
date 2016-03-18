@@ -1,2 +1,5 @@
-css/main.css
-css/main.css.map
+config.php
+cache/*
+**/*.css
+.ftpconfig
+*.css.map
