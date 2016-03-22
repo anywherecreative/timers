@@ -238,7 +238,7 @@
     var tid = Number(Date.now()).toString(16);
     $('#timers').append("<div class='row-fluid timer' id='" + tid + "'></div>");
     var item = $('#'+tid);
-    if(typeof description == null) {
+    if(typeof description == 'undefined') {
       item.append("<div class='col-md-7 col-sm-12 description blank'><span class='hidden-print'>" + defaultDescription + "</span><span class='visible-print-inline'>No Description</span></div>");
       description = '';
     }
