@@ -83,7 +83,7 @@
   }
 
   function assignAction() {
-    $('.timer, .delete,.description').off();
+    $('.timer, .delete,.description, .timer-toggle BUTTON:not(.delete)').off();
     $('.timer-toggle BUTTON:not(.delete)').click(function() {
       var item = $(this).parent().parent();
       var id = item.attr('id');
