@@ -9,6 +9,7 @@ if(isset($_SESSION['user'])):
 endif;
 require('config.php');
 require('constant.php');
+require('user.class.php');
 if(SHOW_SYSTEM_ERRORS) {
 	error_reporting(E_ALL | E_STRICT);
 	ini_set("display_errors", 1);

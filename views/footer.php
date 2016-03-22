@@ -27,5 +27,8 @@ if($this->isVariable('errors')):
 <script>
 	var error = <?=$this->loadVariable('errors');?>;
 </script>
+<?php
+endif;
+?>
 </body>
 </html>

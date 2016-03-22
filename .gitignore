@@ -3,3 +3,5 @@ cache/*
 **/*.css
 .ftpconfig
 *.css.map
+libs
+libs/*

@@ -26,6 +26,10 @@ class Controller {
 			$this->addTitle("Home - Time Tracking");
 			$this->loadView('track');
 		}
+		elseif($_GET['option'] == 'user') {
+			require_once('controllers/user.controller.php');
+			$uc = New UserController();
+		}
 		elseif($_GET['option'] == 'system' && SHOW_SYSTEM_INFO) {
 			//system information
 			phpinfo();
